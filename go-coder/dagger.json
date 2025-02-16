@@ -1,6 +1,6 @@
 {
   "name": "go-coder",
-  "engineVersion": "v0.15.4",
+  "engineVersion": "v0.16.0-250214170411-5c9108afeb09",
   "sdk": {
     "source": "go"
   },
@@ -8,7 +8,7 @@
     {
       "name": "feature-branch",
       "source": "github.com/kpenfound/dag/feature-branch",
-      "pin": "5346a039d51f3c2e440519430e49baabaf831815"
+      "pin": "02e7751c80b111742902773d188706368bd8fadd"
     },
     {
       "name": "github-issue",
@@ -18,7 +18,7 @@
     {
       "name": "workspace",
       "source": "github.com/kpenfound/dag/workspace",
-      "pin": "5346a039d51f3c2e440519430e49baabaf831815"
+      "pin": "90d2d98a161279c9402fe8c23679556dc95e1ba3"
     }
   ],
   "source": "."
