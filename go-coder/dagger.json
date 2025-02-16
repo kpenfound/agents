@@ -8,17 +8,17 @@
     {
       "name": "feature-branch",
       "source": "github.com/kpenfound/dag/feature-branch",
-      "pin": "02e7751c80b111742902773d188706368bd8fadd"
+      "pin": "467ef3f89f46b4425fac0d8744617df5d1ecb546"
     },
     {
       "name": "github-issue",
       "source": "github.com/kpenfound/dag/github-issue",
-      "pin": "5346a039d51f3c2e440519430e49baabaf831815"
+      "pin": "fc2a4886e7eda23c8daa1ecb23bec5985ec19a63"
     },
     {
       "name": "workspace",
       "source": "github.com/kpenfound/dag/workspace",
-      "pin": "90d2d98a161279c9402fe8c23679556dc95e1ba3"
+      "pin": "fc2a4886e7eda23c8daa1ecb23bec5985ec19a63"
     }
   ],
   "source": "."
