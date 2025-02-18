@@ -20,8 +20,8 @@ OPENAI_MODEL="qwen2.5-coder:32b"
 
 If you're using a different service, your `.env` will look different.
 
-### Running the go-programmer agent
-From the go-programmer directory, get a Dagger shell. Alternatively, you can load this dagger module remotely with `dagger -m github.com/kpenfound/agents/go-programmer shell`
+### Running the go-coder agent
+From the go-coder directory, get a Dagger shell. Alternatively, you can load this dagger module remotely with `dagger -m github.com/kpenfound/agents/go-coder shell`
 
 `_EXPERIMENTAL_DAGGER_RUNNER_HOST=tcp://localhost:1234 ~/bin/dagger-llm shell`
 
