@@ -8,6 +8,11 @@ import (
 	"fmt"
 )
 
+const (
+	DEFAULT_CODER_MODEL = "qwen2.5-coder:32b"
+	DEFAULT_CHAT_MODEL  = "llama3.3"
+)
+
 type GoCoder struct{}
 
 // Ask a go-coder to complete a task and get the Container with the completed task
@@ -25,8 +30,13 @@ func (m *GoCoder) Assignment(
 	// Give the workspace to the LLM
 	coder := dag.Llm().
 		WithWorkspace(ws).
+		WithPromptFile(dag.CurrentModule().Source().File("system.txt")).
 		WithPromptVar("assignment", task).
-		WithPromptFile(dag.CurrentModule().Source().File("prompt.txt")).
+		WithPrompt(`
+<assignment>
+$assignment
+</assignment>
+		`).
 		Loop()
 
 	// Return the container
@@ -42,7 +52,16 @@ func (m *GoCoder) SolveIssue(
 	repo string,
 	// Issue number to solve
 	issueId int,
+	// LLM Model
+	// +optional
+	model string,
 ) (string, error) {
+	coderModel := DEFAULT_CODER_MODEL
+	chatModel := DEFAULT_CHAT_MODEL
+	if model != "" {
+		coderModel = model
+		chatModel = model
+	}
 	// Read assignment from the github issue
 	issue := dag.GithubIssue(githubToken).Read(repo, issueId)
 
@@ -58,7 +77,7 @@ func (m *GoCoder) SolveIssue(
 		Checker:   "go build ./...",
 	})
 
-	coder := dag.Llm().
+	coder := dag.Llm(dagger.LlmOpts{Model: coderModel}).
 		WithWorkspace(ws).
 		WithPromptFile(dag.CurrentModule().Source().File("system.txt")).
 		WithPromptVar("assignment", task).
@@ -72,11 +91,11 @@ $assignment
 	completedWork := coder.Workspace().Container().Directory(".")
 
 	// Create a pull request with the completed assignment
-	branchName, err := askAnLLM(ctx, task, "Choose a git branch name apprpriate for this assignment. A git branch name should be no more than 20 alphanumeric characters.")
+	branchName, err := askAnLLM(ctx, task, "Choose a git branch name apprpriate for this assignment. A git branch name should be no more than 20 alphanumeric characters.", chatModel)
 	if err != nil {
 		return "", err
 	}
-	title, err := askAnLLM(ctx, task, "Choose a pull request title that describes the changes made in this assignment.")
+	title, err := askAnLLM(ctx, task, "Choose a pull request title that describes the changes made in this assignment.", chatModel)
 	if err != nil {
 		return "", err
 	}
@@ -107,11 +126,20 @@ func (m *GoCoder) PrFeedback(
 	prNumber int,
 	// PR feedback
 	feedback string,
+	// LLM Model
+	// +optional
+	model string,
 ) (string, error) {
+	coderModel := DEFAULT_CODER_MODEL
+	chatModel := DEFAULT_CHAT_MODEL
+	if model != "" {
+		coderModel = model
+		chatModel = model
+	}
 	// Read original assignment from the github issue
 	issue := dag.GithubIssue(githubToken).Read(repo, prNumber)
 
-	title, err := askAnLLM(ctx, feedback, "Choose a git commit message that describes the changes made in this assignment.")
+	title, err := askAnLLM(ctx, feedback, "Choose a git commit message that describes the changes made in this assignment.", chatModel)
 	if err != nil {
 		return "", err
 	}
@@ -139,7 +167,7 @@ func (m *GoCoder) PrFeedback(
 		Checker:   "go build ./...",
 	}).WriteDirectory(".", head.WithoutDirectory(".git")) // Layer on changes already made in the PR
 
-	coder := dag.Llm().
+	coder := dag.Llm(dagger.LlmOpts{Model: coderModel}).
 		WithWorkspace(ws).
 		WithPromptFile(dag.CurrentModule().Source().File("system.txt")).
 		WithPromptVar("assignment", task).
@@ -194,8 +222,8 @@ $feedback
 	return featureBranch.Push(ctx, title)
 }
 
-func askAnLLM(ctx context.Context, queryContext, query string) (string, error) {
-	return dag.Llm().
+func askAnLLM(ctx context.Context, queryContext, query string, model string) (string, error) {
+	return dag.Llm(dagger.LlmOpts{Model: model}).
 		WithPromptVar("query", query).
 		WithPromptVar("context", queryContext).
 		WithPrompt(`
