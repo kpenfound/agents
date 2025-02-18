@@ -28,10 +28,13 @@ From the go-programmer directory, get a Dagger shell. Alternatively, you can loa
 Try the different functions:
 
 This will create a new go project and put you in a terminal in the project's directory:
+
 `assignment "make a hello world app" | terminal`
 
-This will read the [Github issue here](https://github.com/kpenfound/greetings-api/issues/32), read the issue body, complete the work described, and open a PR with the completed work
+This will read the [Github issue here](https://github.com/kpenfound/greetings-api/issues/32), read the issue body, complete the work described, and open a PR with the completed work:
+
 `solve-issue GITHUB_TOKEN github.com/kpenfound/greetings-api 32`
 
-This will read the [Github pull request here](https://github.com/kpenfound/greetings-api/pull/43), recieve feedback from the input, and add a new commit based on the feedback given.
+This will read the [Github pull request here](https://github.com/kpenfound/greetings-api/pull/43), recieve feedback from the input, and add a new commit based on the feedback given:
+
 `feedback GITHUB_TOKEN github.com/kpenfound/greetings-api 43 "please add a test for the new greeting function"`
