@@ -37,7 +37,7 @@ func (m *GoCoder) Assignment(
 $assignment
 </assignment>
 		`).
-		Loop()
+		Sync()
 
 	// Return the container
 	return coder.Workspace().Container()
@@ -86,7 +86,7 @@ func (m *GoCoder) SolveIssue(
 $assignment
 </assignment>
 		`).
-		Loop()
+		Sync()
 
 	completedWork := coder.Workspace().Container().Directory(".")
 
@@ -184,7 +184,7 @@ $assignment
 $feedback
 </feedback>
 		`).
-		Loop()
+		Sync()
 
 	completedWork := coder.Workspace().Container().Directory(".")
 
@@ -235,6 +235,5 @@ Do not explain the response, simply return the answer.
 <query>$query</query>
 
 <context>$context</context>`).
-		Loop().
 		LastReply(ctx)
 }
