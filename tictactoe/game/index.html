@@ -1,0 +1,209 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Tic Tac Toe</title>
+        <style>
+            body {
+                font-family: sans-serif;
+            }
+
+            .board {
+                display: grid;
+                grid-template-columns: repeat(3, 100px);
+                grid-gap: 5px;
+                margin-top: 20px;
+            }
+
+            .cell {
+                width: 100px;
+                height: 100px;
+                border: 1px solid black;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 48px;
+                cursor: pointer;
+            }
+
+            .message {
+                margin-top: 20px;
+                font-weight: bold;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Tic Tac Toe</h1>
+
+        <button id="newGameButton">New Game</button>
+
+        <div id="gameIdDisplay">Game ID: <span id="gameIdValue"></span></div>
+
+        <div class="board" id="board">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
+
+        <div class="message" id="message"></div>
+
+        <script>
+            const boardElement = document.getElementById("board");
+            const messageElement = document.getElementById("message");
+            const newGameButton = document.getElementById("newGameButton");
+            const apiUrl = "http://localhost:3000"; // Replace with your API URL
+            let gameId = null;
+            let currentPlayer = null;
+            let gameStatus = null; // To disable clicking after the game ends
+            const gameIdValueElement = document.getElementById("gameIdValue");
+            let pollingInterval; // Variable to store the polling interval ID
+            const POLLING_INTERVAL_MS = 2000; // Poll every 2 seconds
+
+            newGameButton.addEventListener("click", startNewGame);
+
+            async function startNewGame() {
+                try {
+                    const response = await fetch(`${apiUrl}/games`, {
+                        method: "POST",
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(
+                            `HTTP error! status: ${response.status}`,
+                        );
+                    }
+
+                    const data = await response.json();
+                    gameId = data.gameId;
+                    currentPlayer = data.gameState.currentPlayer;
+                    gameStatus = data.gameState.status;
+
+                    gameIdValueElement.textContent = gameId; // Display the game ID
+
+                    updateBoard(data.gameState.board);
+                    updateMessage(`Player ${currentPlayer}'s turn`);
+
+                    startPolling(); // Start polling for updates
+                } catch (error) {
+                    console.error("Failed to create a new game:", error);
+                    updateMessage(
+                        "Failed to create a new game. Check console.",
+                    );
+                }
+            }
+
+            boardElement.addEventListener("click", async (event) => {
+                if (gameStatus !== "ongoing") {
+                    return; // Disable clicking if the game is not ongoing
+                }
+
+                const cell = event.target;
+                if (!cell.classList.contains("cell")) {
+                    return;
+                }
+
+                const index = cell.dataset.index;
+
+                try {
+                    const response = await fetch(
+                        `${apiUrl}/games/${gameId}/moves`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({ position: parseInt(index) }),
+                        },
+                    );
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(
+                            errorData.error ||
+                                `HTTP error! status: ${response.status}`,
+                        );
+                    }
+
+                    const data = await response.json();
+                    updateBoard(data.board);
+                    currentPlayer = data.currentPlayer;
+                    gameStatus = data.status;
+
+                    if (data.status === "won") {
+                        updateMessage(`Player ${data.winner} wins!`);
+                        stopPolling(); // Stop polling when game is over
+                    } else if (data.status === "draw") {
+                        updateMessage("It's a draw!");
+                        stopPolling(); // Stop polling when game is over
+                    } else {
+                        updateMessage(`Player ${currentPlayer}'s turn`);
+                    }
+                } catch (error) {
+                    console.error("Failed to make a move:", error);
+                    updateMessage(`Failed to make a move: ${error.message}`);
+                }
+            });
+
+            function updateBoard(boardData) {
+                const cells = document.querySelectorAll(".cell");
+                cells.forEach((cell, index) => {
+                    cell.textContent = boardData[index] || "";
+                });
+            }
+
+            function updateMessage(message) {
+                messageElement.textContent = message;
+            }
+
+            async function getGameState() {
+                try {
+                    const response = await fetch(`${apiUrl}/games/${gameId}`);
+                    if (!response.ok) {
+                        throw new Error(
+                            `HTTP error! status: ${response.status}`,
+                        );
+                    }
+                    const data = await response.json();
+
+                    updateBoard(data.board);
+                    currentPlayer = data.currentPlayer;
+                    gameStatus = data.status;
+
+                    if (data.status === "won") {
+                        updateMessage(`Player ${data.winner} wins!`);
+                        stopPolling();
+                    } else if (data.status === "draw") {
+                        updateMessage("It's a draw!");
+                        stopPolling();
+                    } else {
+                        updateMessage(`Player ${currentPlayer}'s turn`);
+                    }
+                } catch (error) {
+                    console.error("Failed to get game state:", error);
+                    updateMessage("Failed to get game state. Check console.");
+                    stopPolling(); // Stop polling on error to prevent repeated failures
+                }
+            }
+
+            function startPolling() {
+                if (pollingInterval) {
+                    stopPolling(); // Ensure no existing interval
+                }
+                pollingInterval = setInterval(
+                    getGameState,
+                    POLLING_INTERVAL_MS,
+                );
+            }
+
+            function stopPolling() {
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+            }
+        </script>
+    </body>
+</html>

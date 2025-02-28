@@ -1,0 +1,7 @@
+{
+  "name": "tictactoeClient",
+  "engineVersion": "v0.17.0-llm.3",
+  "sdk": {
+    "source": "typescript"
+  }
+}
