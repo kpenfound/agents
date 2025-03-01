@@ -42,9 +42,10 @@ export class TictactoeClient {
     }
     await new Promise((resolve) => setTimeout(resolve, 1000));
     let newState = JSON.parse(await this.get());
-    while (((newState = JSON.parse(await this.get())), newState.turn == "X")) {
+    while (newState.currentPlayer != "O") {
       // wait for turn to be O
       await new Promise((resolve) => setTimeout(resolve, 1000));
+      newState = JSON.parse(await this.get());
     }
 
     // Check for opponent move
@@ -83,6 +84,7 @@ export class TictactoeClient {
     return await dag
       .container()
       .from("alpine/curl")
+      .withEnvVariable("NOCACHE", `${Math.floor(Date.now() / 1000)}`)
       // .withServiceBinding("game", this.game)
       .withExec([
         "curl",
@@ -97,6 +99,7 @@ export class TictactoeClient {
     return await dag
       .container()
       .from("alpine/curl")
+      .withEnvVariable("NOCACHE", `${Math.floor(Date.now() / 1000)}`)
       // .withServiceBinding("game", this.game)
       .withExec([
         "curl",
