@@ -1,6 +1,6 @@
 {
   "name": "go-coder",
-  "engineVersion": "v0.16.0-llm.2",
+  "engineVersion": "v0.17.1-250304140632-f7817f0ea31e",
   "sdk": {
     "source": "go"
   },
@@ -20,6 +20,5 @@
       "source": "github.com/kpenfound/dag/workspace",
       "pin": "fc2a4886e7eda23c8daa1ecb23bec5985ec19a63"
     }
-  ],
-  "source": "."
+  ]
 }

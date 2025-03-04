@@ -36,8 +36,7 @@ func (m *GoCoder) Assignment(
 <assignment>
 $assignment
 </assignment>
-		`).
-		Sync()
+		`)
 
 	// Return the container
 	return coder.Workspace().Container()
@@ -85,8 +84,7 @@ func (m *GoCoder) SolveIssue(
 <assignment>
 $assignment
 </assignment>
-		`).
-		Sync()
+		`)
 
 	completedWork := coder.Workspace().Container().Directory(".")
 
@@ -183,8 +181,7 @@ $assignment
 <feedback>
 $feedback
 </feedback>
-		`).
-		Sync()
+		`)
 
 	completedWork := coder.Workspace().Container().Directory(".")
 
