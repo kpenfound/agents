@@ -19,16 +19,29 @@ type GoCoder struct{}
 func (m *GoCoder) Assignment(
 	// The task to complete
 	task string,
+	// Optional project to start with
+	// +optional
+	project *dagger.Directory,
+	// Optional model to use
+	// +optional
+	model string,
 ) *dagger.Container {
+	if project == nil {
+		project = dag.Directory()
+	}
+	llmOpts := dagger.LlmOpts{}
+	if model != "" {
+		llmOpts.Model = model
+	}
 	// Create a workspace for building Go code
 	ws := dag.Workspace(dagger.WorkspaceOpts{
 		BaseImage: "golang",
-		Context:   dag.Directory(),
+		Context:   project,
 		Checker:   "go build ./...",
 	})
 
 	// Give the workspace to the LLM
-	coder := dag.Llm().
+	coder := dag.Llm(llmOpts).
 		WithWorkspace(ws).
 		WithPromptFile(dag.CurrentModule().Source().File("system.txt")).
 		WithPromptVar("assignment", task).

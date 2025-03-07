@@ -18,7 +18,7 @@
     {
       "name": "workspace",
       "source": "github.com/kpenfound/dag/workspace",
-      "pin": "274fc3e830f720c2bb5eff75a7d9e4d67ce8e606"
+      "pin": "d1c42dcd8f29d44370286e259814eb4d687b6970"
     }
   ]
 }
