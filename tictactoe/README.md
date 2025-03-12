@@ -2,6 +2,10 @@
 
 ## Play tic tac toe against any LLM
 
+
+https://github.com/user-attachments/assets/ae2ea04a-70f0-4440-bc5f-57bde79af646
+
+
 ### What is this?
 This is a demo to play tic tac toe against any LLM.
 
