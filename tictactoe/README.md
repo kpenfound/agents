@@ -14,7 +14,7 @@ https://docs.dagger.io/ai-agents#initial-setup
 1. Run the game server `dagger -c "server | up"`
 2. Run the web client `dagger -c "play | up"`
 3. Navigate to `http://localhost/` and start a game
-4. Run the agent with `dagger shell -c "ai tcp://localhost:3000 {game ID}"`
+4. Run the agent with `dagger -c "ai tcp://localhost:3000 {game ID}"`
 
 
 #### Fun to try:
