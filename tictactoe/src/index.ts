@@ -1,7 +1,7 @@
 /**
  * A generated module for Tictactoe functions
  */
-import { dag, Container, object, func, Service } from "@dagger.io/dagger";
+import { dag, object, func, Service } from "@dagger.io/dagger";
 
 @object()
 export class Tictactoe {
@@ -52,7 +52,7 @@ export class Tictactoe {
    * FIXME: This needs the IP instead of the Service itself until a Dagger bug is fixed.
    */
   @func()
-  async ai(gameEndpoint: string, gameId: string): Promise<string[]> {
+  async ai(gameEndpoint: Service, gameId: string): Promise<string[]> {
     // get an instance of the game client to give to the llm
     const client = dag.tictactoeClient(gameEndpoint, gameId);
     // the game client gives the LLM the tools to play

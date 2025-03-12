@@ -1,21 +1,14 @@
 /**
  * A generated module for TictactoeClient functions
  */
-import {
-  dag,
-  Container,
-  Directory,
-  object,
-  func,
-  Service,
-} from "@dagger.io/dagger";
+import { dag, object, func, Service } from "@dagger.io/dagger";
 
 @object()
 export class TictactoeClient {
-  game: string;
+  game: Service;
   gameId: string;
 
-  constructor(game: string, gameId: string) {
+  constructor(game: Service, gameId: string) {
     this.game = game;
     this.gameId = gameId;
   }
@@ -84,14 +77,10 @@ export class TictactoeClient {
     return await dag
       .container()
       .from("alpine/curl")
+      .withServiceBinding("game", this.game)
       .withEnvVariable("NOCACHE", `${Math.floor(Date.now() / 1000)}`)
       // .withServiceBinding("game", this.game)
-      .withExec([
-        "curl",
-        "-X",
-        "GET",
-        `http://${this.game}:3000/games/${this.gameId}`,
-      ])
+      .withExec(["curl", "-X", "GET", `http://game:3000/games/${this.gameId}`])
       .stdout();
   }
 
@@ -99,6 +88,7 @@ export class TictactoeClient {
     return await dag
       .container()
       .from("alpine/curl")
+      .withServiceBinding("game", this.game)
       .withEnvVariable("NOCACHE", `${Math.floor(Date.now() / 1000)}`)
       // .withServiceBinding("game", this.game)
       .withExec([
@@ -109,7 +99,7 @@ export class TictactoeClient {
         "Content-Type: application/json",
         "-d",
         `{"position": ${position}}`,
-        `http://${this.game}:3000/games/${this.gameId}/moves`,
+        `http://game:3000/games/${this.gameId}/moves`,
       ])
       .stdout();
   }
