@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	DAGGER_LLM_VERSION = "0.16.0-llm.2"
+	DAGGER_LLM_VERSION = "0.17.1"
 	BOT_NAME           = "kpenfound"
 )
 

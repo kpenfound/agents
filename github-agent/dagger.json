@@ -1,6 +1,6 @@
 {
   "name": "github-agent",
-  "engineVersion": "v0.16.0-llm.2",
+  "engineVersion": "v0.17.1",
   "sdk": {
     "source": "go"
   },
@@ -8,8 +8,7 @@
     {
       "name": "go-coder",
       "source": "github.com/kpenfound/agents/go-coder",
-      "pin": "eb03cac0be61422ebc76d684361659f45901632a"
+      "pin": "94bb8ed666947d3317ff64f87207ecf2449f09ff"
     }
-  ],
-  "source": "."
+  ]
 }
