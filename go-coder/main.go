@@ -17,9 +17,10 @@ type GoCoder struct{}
 
 // Ask a go-coder to complete a task and get the Container with the completed task
 func (m *GoCoder) Assignment(
+	ctx context.Context,
 	// The task to complete
 	task string,
-) *dagger.Container {
+) (*dagger.Container, error) {
 	// Create a workspace for building Go code
 	ws := dag.Workspace(dagger.WorkspaceOpts{
 		BaseImage: "golang",
@@ -28,7 +29,7 @@ func (m *GoCoder) Assignment(
 	})
 
 	// Give the workspace to the LLM
-	coder := dag.Llm().
+	coder, err := dag.LLM().
 		WithWorkspace(ws).
 		WithPromptFile(dag.CurrentModule().Source().File("system.txt")).
 		WithPromptVar("assignment", task).
@@ -37,10 +38,13 @@ func (m *GoCoder) Assignment(
 $assignment
 </assignment>
 		`).
-		Sync()
+		Sync(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	// Return the container
-	return coder.Workspace().Container()
+	return coder.Workspace().Container(), nil
 }
 
 // Returns a container that echoes whatever string argument is provided
@@ -77,7 +81,7 @@ func (m *GoCoder) SolveIssue(
 		Checker:   "go build ./...",
 	})
 
-	coder := dag.Llm(dagger.LlmOpts{Model: coderModel}).
+	coder, err := dag.LLM(dagger.LLMOpts{Model: coderModel}).
 		WithWorkspace(ws).
 		WithPromptFile(dag.CurrentModule().Source().File("system.txt")).
 		WithPromptVar("assignment", task).
@@ -86,7 +90,10 @@ func (m *GoCoder) SolveIssue(
 $assignment
 </assignment>
 		`).
-		Sync()
+		Sync(ctx)
+	if err != nil {
+		return "", err
+	}
 
 	completedWork := coder.Workspace().Container().Directory(".")
 
@@ -167,7 +174,7 @@ func (m *GoCoder) PrFeedback(
 		Checker:   "go build ./...",
 	}).WriteDirectory(".", head.WithoutDirectory(".git")) // Layer on changes already made in the PR
 
-	coder := dag.Llm(dagger.LlmOpts{Model: coderModel}).
+	coder, err := dag.LLM(dagger.LLMOpts{Model: coderModel}).
 		WithWorkspace(ws).
 		WithPromptFile(dag.CurrentModule().Source().File("system.txt")).
 		WithPromptVar("assignment", task).
@@ -184,7 +191,10 @@ $assignment
 $feedback
 </feedback>
 		`).
-		Sync()
+		Sync(ctx)
+	if err != nil {
+		return "", err
+	}
 
 	completedWork := coder.Workspace().Container().Directory(".")
 
@@ -223,7 +233,7 @@ $feedback
 }
 
 func askAnLLM(ctx context.Context, queryContext, query string, model string) (string, error) {
-	return dag.Llm(dagger.LlmOpts{Model: model}).
+	return dag.LLM(dagger.LLMOpts{Model: model}).
 		WithPromptVar("query", query).
 		WithPromptVar("context", queryContext).
 		WithPrompt(`
