@@ -1,5 +1,4 @@
 // A generated module for GoCoder functions
-
 package main
 
 import (
@@ -28,23 +27,27 @@ func (m *GoCoder) Assignment(
 		Checker:   "go build ./...",
 	})
 
+	env := dag.Env().
+		WithWorkspaceInput("workspace", ws, "tools to write and build Go code").
+		WithStringInput("task", task, "coding task to complete").
+		WithWorkspaceOutput("workspace", "completed task")
+
 	// Give the workspace to the LLM
 	coder, err := dag.LLM().
-		WithWorkspace(ws).
+		WithEnv(env).
 		WithPromptFile(dag.CurrentModule().Source().File("system.txt")).
-		WithPromptVar("assignment", task).
-		WithPrompt(`
-<assignment>
-$assignment
-</assignment>
-		`).
+		WithPrompt("complete the task: $task").
 		Sync(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	// Return the container
-	return coder.Workspace().Container(), nil
+	return coder.
+		Env().
+		Output("workspace").
+		AsWorkspace().
+		Container(), nil
 }
 
 // Returns a container that echoes whatever string argument is provided
@@ -81,21 +84,26 @@ func (m *GoCoder) SolveIssue(
 		Checker:   "go build ./...",
 	})
 
+	env := dag.Env().
+		WithWorkspaceInput("workspace", ws, "tools to write and build Go code").
+		WithStringInput("task", task, "coding task to complete").
+		WithWorkspaceOutput("workspace", "completed task")
+
 	coder, err := dag.LLM(dagger.LLMOpts{Model: coderModel}).
-		WithWorkspace(ws).
+		WithEnv(env).
 		WithPromptFile(dag.CurrentModule().Source().File("system.txt")).
-		WithPromptVar("assignment", task).
-		WithPrompt(`
-<assignment>
-$assignment
-</assignment>
-		`).
+		WithPrompt("the assignment is: $assignment").
 		Sync(ctx)
 	if err != nil {
 		return "", err
 	}
 
-	completedWork := coder.Workspace().Container().Directory(".")
+	completedWork := coder.
+		Env().
+		Output("workspace").
+		AsWorkspace().
+		Container().
+		Directory(".")
 
 	// Create a pull request with the completed assignment
 	branchName, err := askAnLLM(ctx, task, "Choose a git branch name apprpriate for this assignment. A git branch name should be no more than 20 alphanumeric characters.", chatModel)
@@ -174,11 +182,14 @@ func (m *GoCoder) PrFeedback(
 		Checker:   "go build ./...",
 	}).WriteDirectory(".", head.WithoutDirectory(".git")) // Layer on changes already made in the PR
 
+	env := dag.Env().
+		WithWorkspaceInput("workspace", ws, "tools to write and build Go code").
+		WithStringInput("task", task, "coding task to complete").
+		WithStringInput("feedback", feedback, "feedback to implement").
+		WithWorkspaceOutput("workspace", "completed task")
 	coder, err := dag.LLM(dagger.LLMOpts{Model: coderModel}).
-		WithWorkspace(ws).
+		WithEnv(env).
 		WithPromptFile(dag.CurrentModule().Source().File("system.txt")).
-		WithPromptVar("assignment", task).
-		WithPromptVar("feedback", feedback).
 		WithPrompt(`
 You have already started solving an assignment.
 You have received feedback on your progress so far.
@@ -196,7 +207,11 @@ $feedback
 		return "", err
 	}
 
-	completedWork := coder.Workspace().Container().Directory(".")
+	completedWork := coder.Env().
+		Output("workspace").
+		AsWorkspace().
+		Container().
+		Directory(".")
 
 	// Git checkout has weird git info. Fix it.
 	gitEnv := dag.Container().
@@ -233,9 +248,11 @@ $feedback
 }
 
 func askAnLLM(ctx context.Context, queryContext, query string, model string) (string, error) {
+	env := dag.Env().
+		WithStringInput("query", query, "query to answer").
+		WithStringInput("context", queryContext, "context to answer the query")
 	return dag.LLM(dagger.LLMOpts{Model: model}).
-		WithPromptVar("query", query).
-		WithPromptVar("context", queryContext).
+		WithEnv(env).
 		WithPrompt(`
 You will be given a query and a context. Answer the query using the context provided.
 Be brief in your responses.

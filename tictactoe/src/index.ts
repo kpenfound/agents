@@ -57,9 +57,12 @@ export class Tictactoe {
     const client = dag.tictactoeClient(gameEndpoint, gameId);
     // the game client gives the LLM the tools to play
     // it will make moves and wait for the opponent to make moves
+    const env = dag
+      .env()
+      .withTictactoeClientInput("client", client, "game client");
     return dag
       .llm()
-      .withTictactoeClient(client)
+      .withEnv(env)
       .withPromptFile(dag.currentModule().source().file("prompt.md"))
       .history();
   }
