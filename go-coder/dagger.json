@@ -1,6 +1,6 @@
 {
   "name": "go-coder",
-  "engineVersion": "v0.17.1",
+  "engineVersion": "v0.18.0",
   "sdk": {
     "source": "go"
   },
