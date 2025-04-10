@@ -9,7 +9,7 @@ import (
 
 type Utils struct{}
 
-// Returns lines that match a pattern in the files of the provided File
+// Returns lines of the file that match a pattern using grep
 func (m *Utils) Grep(
 	ctx context.Context,
 	// Dagger file to search in
@@ -21,6 +21,6 @@ func (m *Utils) Grep(
 		From("alpine:latest").
 		WithFile("/mnt/doc.txt", file).
 		WithWorkdir("/mnt").
-		WithExec([]string{"grep", "-B", "5", "-A", "5", pattern, "doc.txt"}).
+		WithExec([]string{"grep", "-ni", "-C", "10", pattern, "doc.txt"}).
 		Stdout(ctx)
 }
