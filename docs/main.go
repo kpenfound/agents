@@ -52,14 +52,15 @@ func (m *Docs) Prompt(ctx context.Context, prompt string) (string, error) {
 	}
 
 	return dag.LLM().
+		WithSystemPrompt("You are an agent that can lookup information in documentation and summarize it for a user").
 		WithEnv(env).
 		WithPrompt(`
-			You have been provided the documentation for a project in the files $llm and $llmsfull
-			You can read the contents of the files by selecting them and using the contents tool
-			If the file is too big to understand at once, give it to the $utils grep tool to search for what youre looking for
 			You will be provided a prompt for information about the project
-			Using the files and tools available, answer the prompt as accurately and concicesly as possible
-			Show code examples where applicable
+			You have been provided the documentation in the files $llm and $llmsfull
+			You can read the contents of the files by selecting them and then using the contents tool. Always do this.
+			If the file is too big to understand at once, pass it to the $utils grep tool to search for what youre looking for
+			Using the files and tools available, answer the prompt as accurately and concicesly as possible, show code examples where applicable
+			Keep searching your input files and using your tools until you find the answer
 			Your prompt: $prompt`).
 		LastReply(ctx)
 }

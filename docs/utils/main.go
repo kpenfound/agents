@@ -9,7 +9,7 @@ import (
 
 type Utils struct{}
 
-// Returns lines of the file that match a pattern using grep
+// Returns surrounding lines of the file that match a pattern using grep
 func (m *Utils) Grep(
 	ctx context.Context,
 	// Dagger file to search in
