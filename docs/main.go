@@ -54,7 +54,9 @@ func (m *Docs) Prompt(ctx context.Context, prompt string) (string, error) {
 	return dag.LLM().
 		WithEnv(env).
 		WithPrompt(`
-			You have been provided the documentation for a project in $llm and $llmsfull
+			You have been provided the documentation for a project in the files $llm and $llmsfull
+			You can read the contents of the files by selecting them and using the contents tool
+			If the file is too big to understand at once, give it to the $utils grep tool to search for what youre looking for
 			You will be provided a prompt for information about the project
 			Using the files and tools available, answer the prompt as accurately and concicesly as possible
 			Show code examples where applicable
