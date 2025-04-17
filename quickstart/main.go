@@ -13,6 +13,10 @@ func (m *CodingAgent) GoProgram(
 	ctx context.Context,
 	// The programming assignment, e.g. "write me a curl clone"
 	assignment string,
+	// Optional prompt file name
+	// +optional
+	// +default "gpt-4o.md"
+	promptFile string,
 	// Optional model
 	// +optional
 	model string,
@@ -22,12 +26,8 @@ func (m *CodingAgent) GoProgram(
 	if model != "" {
 		llmopts.Model = model
 	}
-	// Get the model name first and get the model-specific prompt
-	model, err := dag.LLM(llmopts).Model(ctx)
-	if err != nil {
-		return nil, err
-	}
-	prompt := fmt.Sprintf("prompts/%s.md", model)
+	// Get the model-specific prompt
+	prompt := fmt.Sprintf("prompts/%s", promptFile)
 
 	// Back to the original quickstart
 	environment := dag.Env().
