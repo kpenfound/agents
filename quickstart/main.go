@@ -33,7 +33,7 @@ func (m *CodingAgent) GoProgram(
 	environment := dag.Env().
 		WithStringInput("assignment", assignment, "the assignment to complete").
 		WithContainerInput("builder",
-			dag.Container().From("golang").WithWorkdir("/app"),
+			dag.Container().From("golang").WithWorkdir("/app").WithExec([]string{"go", "mod", "init", "builder"}),
 			"a container to use for building Go code").
 		WithContainerOutput("completed", "the completed assignment in the Golang container")
 
