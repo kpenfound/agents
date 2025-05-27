@@ -58,7 +58,8 @@ func (m *Docs) Prompt(ctx context.Context, prompt string) (string, error) {
 			You will be provided a prompt for information about the project
 			You have been provided the documentation in the files $llm and $llmsfull
 			You can read the contents of the files by selecting them and then using the contents tool. Always do this.
-			If the file is too big to understand at once, pass it to the $utils grep tool to search for what youre looking for
+			If the file is too big to understand at once, pass it to the $utils grep tool to search for what youre looking for.
+			When searching with the grep tool, use single keywords to search for context.
 			Using the files and tools available, answer the prompt as accurately and concicesly as possible, show code examples where applicable
 			Keep searching your input files and using your tools until you find the answer
 			Your prompt: $prompt`).
