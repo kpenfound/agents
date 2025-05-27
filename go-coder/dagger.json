@@ -1,6 +1,6 @@
 {
   "name": "go-coder",
-  "engineVersion": "v0.18.0",
+  "engineVersion": "v0.18.8",
   "sdk": {
     "source": "go"
   },
@@ -8,7 +8,7 @@
     {
       "name": "feature-branch",
       "source": "github.com/kpenfound/dag/feature-branch",
-      "pin": "aeda09133df4ec88e3aabf513000753db6d2aa30"
+      "pin": "273ca2c743001ca8b8f8468059469d63888cb9fd"
     },
     {
       "name": "github-issue",
